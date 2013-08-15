@@ -30,6 +30,7 @@ void usage(const char *appname) {
 		"  -b, --base=URL            use URL as document base (useful when reading from stdin)\n"
 		"  -a, --user-agent=AGENT    use AGENT as the user agent\n"
 		"  -r, --referrer=URL        use URL as referrer\n"
+		"  -R, --no-redirect         don't follow redirects\n"
 		"  -c, --cookie-file=FILE    read cookies from FILE\n"
 		"  -j, --cookie-jar=FILE     write cookies to FILE\n"
 		"  -H, --header=HEADER       send additional request header\n"
@@ -53,6 +54,7 @@ int main(int argc, char* argv[]) {
 	const char *cookie_jar = NULL;
 	struct curl_slist *headers = NULL;
 	int tags = LSLINKS_ALL;
+	bool redirect = true;
 
 	struct lslinks_print_options print_opts = { false, '\n', stdout };
 	struct option long_options[] = {
@@ -62,6 +64,7 @@ int main(int argc, char* argv[]) {
 		{"base",        required_argument, 0, 'b'},
 		{"user-agent",  required_argument, 0, 'a'},
 		{"referrer",    required_argument, 0, 'r'},
+		{"no-redirect", no_argument,       0, 'R'},
 		{"cookie-file", required_argument, 0, 'c'},
 		{"cookie-jar",  required_argument, 0, 'j'},
 		{"header",      required_argument, 0, 'H'},
@@ -74,7 +77,7 @@ int main(int argc, char* argv[]) {
 	};
 
 	for (;;) {
-		int opt = getopt_long(argc, argv, "hvO:b:a:r:H:m:t:n0", long_options, NULL);
+		int opt = getopt_long(argc, argv, "hvO:b:a:r:RH:m:t:n0", long_options, NULL);
 
 		if (opt == -1)
 			break;
@@ -104,6 +107,10 @@ int main(int argc, char* argv[]) {
 
 			case 'r':
 				referrer = optarg;
+				break;
+
+			case 'R':
+				redirect = false;
 				break;
 
 			case 'c':
@@ -157,6 +164,8 @@ int main(int argc, char* argv[]) {
 
 			case '?':
 				fprintf(stderr, "unknown option: -%c\n", opt);
+				if (headers) curl_slist_free_all(headers);
+				return EXIT_FAILURE;
 		}
 	}
 
@@ -252,6 +261,11 @@ int main(int argc, char* argv[]) {
 				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 				curl_easy_setopt(curl, CURLOPT_USERAGENT, agent);
+				curl_easy_setopt(curl, CURLOPT_AUTOREFERER, 1L);;
+
+				if (redirect) {
+					curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+				}
 
 				if (referrer) {
 					curl_easy_setopt(curl, CURLOPT_REFERER, referrer);
