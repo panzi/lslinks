@@ -301,16 +301,24 @@ int main(int argc, char* argv[]) {
 					return EXIT_FAILURE;
 				}
 
-				if (bytes.data) {
-					if (!lslinks_str(bytes.data, tags, !base ? url : base, &print_opts, &lslinks_print_link)) {
-						perror(url);
-						lslinks_bytes_cleanup(&bytes);
-					    curl_easy_cleanup(curl);
-						curl_global_cleanup();
-						if (output) fclose(print_opts.fp);
-						if (headers) curl_slist_free_all(headers);
-						return EXIT_FAILURE;
-					}
+				if (!lslinks_bytes_append(&bytes, "", 1)) {
+					perror(url);
+					lslinks_bytes_cleanup(&bytes);
+				    curl_easy_cleanup(curl);
+					curl_global_cleanup();
+					if (output) fclose(print_opts.fp);
+					if (headers) curl_slist_free_all(headers);
+					return EXIT_FAILURE;
+				}
+
+				if (!lslinks_str(bytes.data, tags, !base ? url : base, &print_opts, &lslinks_print_link)) {
+					perror(url);
+					lslinks_bytes_cleanup(&bytes);
+				    curl_easy_cleanup(curl);
+					curl_global_cleanup();
+					if (output) fclose(print_opts.fp);
+					if (headers) curl_slist_free_all(headers);
+					return EXIT_FAILURE;
 				}
 				lslinks_bytes_cleanup(&bytes);
 			    curl_easy_cleanup(curl);
