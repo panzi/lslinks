@@ -21,12 +21,17 @@ size_t receive_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 
 void usage(const char *appname) {
 	printf(
-		"usage: %s [OPTIONS] [PATH or URL...]\n"
+		"lslinks - list links from a HTML document\n"
+		"Usage: %s [OPTION]... [FILE or URL]...\n"
 		"\n"
 		"OPTIONS:\n"
 		"  -h, --help                print this help message\n"
 		"  -v, --version             print version\n"
 		"  -O, --output=FILE         write output to FILE\n"
+		"  -t, --tags=TAGS           comma separated list of HTML tags to look at\n"
+		"  -n, --tag-name            print tag names\n"
+		"  -d, --delim=CHAR          use CHAR to delimite output (default: '\\n')\n"
+		"  -0, --zero                use a zero-byte to delimite output\n"
 		"  -b, --base=URL            use URL as document base (useful when reading from stdin)\n"
 		"  -a, --user-agent=AGENT    use AGENT as the user agent\n"
 		"  -r, --referrer=URL        use URL as referrer\n"
@@ -36,11 +41,8 @@ void usage(const char *appname) {
 		"  -H, --header=HEADER       send additional request header\n"
 		"  -m, --method=METHOD       set the request METHOD (default: GET)\n"
 		"                            supported values: GET, POST, PUT, DELETE, PATCH\n"
-		"  -t, --tags=TAGS           comma separated list of HTML tags to look at\n"
-		"  -n, --tag-name            print tag names\n"
-		"  -d, --delim=CHAR          use CHAR to delimite output (default: '\\n')\n"
-		"  -0, --zero                use a zero-byte to delimite output\n"
-		"\n",
+		"\n"
+		"Report bugs at https://github.com/panzi/lslinks/issues\n",
 		appname);
 }
 
@@ -48,7 +50,7 @@ int main(int argc, char* argv[]) {
 	const char *base = NULL;
 	const char *output = NULL;
 	enum lslinks_method method = LSLINKS_GET;
-	const char *agent = "Mozilla/5.0 (compatible) LsLinks/1.0";
+	const char *agent = "Mozilla/5.0 (compatible) LsLinks/" LSLINKS_VERSION;
 	const char *referrer = NULL;
 	const char *cookie_file = NULL;
 	const char *cookie_jar = NULL;
@@ -199,8 +201,9 @@ int main(int argc, char* argv[]) {
 				}
 				else {
 					char actualpath[PATH_MAX + 1];
-					realpath(path, actualpath);
-					fileurl = malloc(5 + strlen(actualpath) + 1);
+					if (realpath(path, actualpath)) {
+						fileurl = malloc(5 + strlen(actualpath) + 1);
+					}
 					if (!fileurl) {
 						perror(url);
 						if (output) fclose(print_opts.fp);

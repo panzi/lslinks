@@ -6,7 +6,10 @@
 
 int main (int argc, char *argv[]) {
 	if (argc <= 1) {
-		printf("usage: %s [URL...]\n", argc > 0 ? argv[0] : "joinurl");
+		printf(
+			"joinurl - build an abosulute url from a base url and an relative url\n"
+			"Usage: %s [URL]...\n",
+			argc > 0 ? argv[0] : "joinurl");
 		return EXIT_FAILURE;
 	}
 
@@ -17,7 +20,10 @@ int main (int argc, char *argv[]) {
 		i = 2;
 
 		char actualpath[PATH_MAX + 1];
-		realpath(argv[1], actualpath);
+		if (!realpath(argv[1], actualpath)) {
+			perror(argv[1]);
+			return EXIT_FAILURE;
+		}
 
 		url = lslinks_absurl(actualpath, "file:///");
 		if (!url) {
