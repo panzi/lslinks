@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "bytes.h"
 
 void lslinks_bytes_init(struct lslinks_bytes *bytes) {
@@ -41,6 +43,24 @@ bool lslinks_bytes_append(struct lslinks_bytes *bytes, void *data, size_t size) 
 }
 
 bool lslinks_bytes_readall(struct lslinks_bytes *bytes, FILE *fp) {
+	struct stat st;
+	int fd = fileno(fp);
+	off_t off;
+
+	// read files of known size in one go:
+	if (fd >= 0 && (off = ftello(fp)) >= 0 && fstat(fd, &st) == 0 &&
+		(st.st_mode & (S_IFREG | S_IFCHR | S_IFBLK))) {
+		size_t rem = st.st_size - off;
+		if (!lslinks_bytes_ensure(bytes, rem)) {
+			return false;
+		}
+
+		size_t count = fread(bytes->data + bytes->size, 1, rem, fp);
+		bytes->size += count;
+		return count == rem || !ferror(fp);
+	}
+
+	// read streams chunk by chunk:
 	while (!feof(fp)) {
 		if (!lslinks_bytes_ensure(bytes, BUFSIZ)) {
 			return false;
@@ -49,10 +69,8 @@ bool lslinks_bytes_readall(struct lslinks_bytes *bytes, FILE *fp) {
 		size_t rem = bytes->capacity - bytes->size;
 		size_t count = fread(bytes->data + bytes->size, 1, rem, fp);
 		bytes->size += count;
-		if (count < rem) {
-			if (ferror(fp)) {
-				return false;
-			}
+		if (count < rem && ferror(fp)) {
+			return false;
 		}
 	}
 
