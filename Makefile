@@ -1,30 +1,41 @@
 CFLAGS=-std=gnu99 -Wall -Wno-switch -Werror -g -O2
-LIBS=-lgumbo -lcurl
+LSLINKS_LIBS=-lgumbo -lcurl
+JOINURL_LIBS=-lgumbo
+PREFIX=/usr
+CC=gcc
 
-.PHONY: all clean
+.PHONY: all clean install uninstall
 
-all: lslinks joinurl
+all: build/lslinks build/joinurl
 
-lslinks: main.o lslinks.o url.o bytes.o
-	gcc $(CFLAGS) $(LIBS) -o $@ main.o lslinks.o url.o bytes.o
+install: all
+	install build/lslinks $(PREFIX)/bin
+	install build/joinurl $(PREFIX)/bin
 
-joinurl: joinurl.o url.o
-	gcc $(CFLAGS) $(LIBS) -o $@ joinurl.o url.o
+uninstall:
+	rm $(PREFIX)/bin/lslinks
+	rm $(PREFIX)/bin/joinurl
 
-lslinks.o: lslinks.c lslinks.h
-	gcc $(CFLAGS) $(LIBS) -o $@ -c $<
+build/lslinks: build/main.o build/lslinks.o build/url.o build/bytes.o
+	$(CC) $(CFLAGS) $(LSLINKS_LIBS) -o $@ build/main.o build/lslinks.o build/url.o build/bytes.o
 
-joinurl.o: joinurl.c url.h
-	gcc $(CFLAGS) $(LIBS) -o $@ -c $<
+build/joinurl: build/joinurl.o build/url.o
+	$(CC) $(CFLAGS) $(JOINURL_LIBS) -o $@ build/joinurl.o build/url.o
 
-main.o: main.c lslinks.h
-	gcc $(CFLAGS) $(LIBS) -o $@ -c $<
+build/lslinks.o: src/lslinks.c src/lslinks.h
+	$(CC) $(CFLAGS) -o $@ -c $<
 
-bytes.o: bytes.c bytes.h
-	gcc $(CFLAGS) $(LIBS) -o $@ -c $<
+build/joinurl.o: src/joinurl.c src/url.h
+	$(CC) $(CFLAGS) -o $@ -c $<
 
-url.o: url.c bytes.h
-	gcc $(CFLAGS) $(LIBS) -o $@ -c $<
+build/main.o: src/main.c src/lslinks.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+build/bytes.o: src/bytes.c src/bytes.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+build/url.o: src/url.c src/bytes.h
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm lslinks joinurl joinurl.o url.o bytes.o main.o lslinks.o
+	rm build/lslinks build/joinurl build/joinurl.o build/url.o build/bytes.o build/main.o build/lslinks.o
