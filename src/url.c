@@ -97,7 +97,7 @@ bool lslinks_absurl_bytes(const char *url, const char *base, struct lslinks_byte
 		urllen = urlend - url;
 	}
 	else {
-		return strdup(base);
+		return lslinks_bytes_append_str(bytes, base);
 	}
 
 	if (lslinks_is_absurl(url)) {
