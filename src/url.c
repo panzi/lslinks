@@ -81,16 +81,22 @@ char *lslinks_absurl(const char *url, const char *base) {
 
 bool lslinks_absurl_bytes(const char *url, const char *base, struct lslinks_bytes *bytes) {
 	const char *ptr;
+	size_t urllen;
 
 	while (isspace(*url)) ++ url;
 	
-	const char *urlend = url + strlen(url);
+	if (*url) {
+		const char *urlend = url + strlen(url);
 
-	while (urlend > url && isspace(*urlend)) -- urlend;
+		while (urlend > url) {
+			const char *next = urlend - 1;
+			if (!isspace(*next)) break;
+			urlend = next;
+		}
 
-	size_t urllen = urlend - url;
-
-	if (urllen == 0) {
+		urllen = urlend - url;
+	}
+	else {
 		return strdup(base);
 	}
 
