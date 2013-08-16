@@ -6,21 +6,25 @@ CC=gcc
 
 .PHONY: all clean install uninstall
 
-all: build/lslinks build/joinurl
+all: build/lslinks build/joinurl build/lslinks.1.gz build/joinurl.1.gz
 
 install: all
 	install build/lslinks $(PREFIX)/bin
 	install build/joinurl $(PREFIX)/bin
+	install build/lslinks.1.gz $(PREFIX)/share/man/man1
+	install build/joinurl.1.gz $(PREFIX)/share/man/man1
 
 uninstall:
 	rm $(PREFIX)/bin/lslinks
 	rm $(PREFIX)/bin/joinurl
+	rm $(PREFIX)/share/man/man1/lslinks.1.gz
+	rm $(PREFIX)/share/man/man1/joinurl.1.gz
 
 build/lslinks: build/main.o build/lslinks.o build/url.o build/bytes.o
 	$(CC) $(CFLAGS) $(LSLINKS_LIBS) -o $@ build/main.o build/lslinks.o build/url.o build/bytes.o
 
-build/joinurl: build/joinurl.o build/url.o
-	$(CC) $(CFLAGS) $(JOINURL_LIBS) -o $@ build/joinurl.o build/url.o
+build/joinurl: build/joinurl.o build/url.o build/bytes.o
+	$(CC) $(CFLAGS) $(JOINURL_LIBS) -o $@ build/joinurl.o build/url.o build/bytes.o
 
 build/lslinks.o: src/lslinks.c src/lslinks.h
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -36,6 +40,12 @@ build/bytes.o: src/bytes.c src/bytes.h
 
 build/url.o: src/url.c src/bytes.h
 	$(CC) $(CFLAGS) -o $@ -c $<
+
+build/lslinks.1.gz: man/lslinks.man
+	gzip $< -c > $@
+
+build/joinurl.1.gz: man/joinurl.man
+	gzip $< -c > $@
 
 clean:
 	rm build/lslinks build/joinurl build/joinurl.o build/url.o build/bytes.o build/main.o build/lslinks.o

@@ -3,7 +3,6 @@
 
 #include "lslinks.h"
 #include "url.h"
-#include "bytes.h"
 #include <gumbo.h>
 
 struct lslinks_data {

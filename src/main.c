@@ -183,65 +183,60 @@ int main(int argc, char* argv[]) {
 	if (optind < argc) {
 		bool used_curl = false;
 		for (; optind < argc; ++ optind) {
-			const char *url = argv[optind];
-			bool isfileurl = strncasecmp("file:",url,5) == 0;
+			char *arg = argv[optind];
+			bool isfileurl = lslinks_is_fileurl(arg);
 			
-			if (isfileurl || !lslinks_is_absurl(url)) {
-				const char *path = url;
+			if (isfileurl || !lslinks_is_absurl(arg)) {
+				char *path = NULL;
 				char *fileurl = NULL;
 
 				if (isfileurl) {
-					path += 5;
-					if (path[0] == '/' && path[1] == '/') {
-						++ path;
-						if (path[1] == '/') {
-							++ url;
-						}
-					}
+					path = lslinks_url_to_path(arg);
+					fileurl = arg;
 				}
 				else {
-					char actualpath[PATH_MAX + 1];
-					if (realpath(path, actualpath)) {
-						fileurl = malloc(5 + strlen(actualpath) + 1);
-					}
-					if (!fileurl) {
-						perror(url);
-						if (output) fclose(print_opts.fp);
-						if (headers) curl_slist_free_all(headers);
-						if (used_curl) curl_global_cleanup();
-						return EXIT_FAILURE;
-					}
-					strcpy(fileurl, "file://");
-					strcat(fileurl, actualpath);
+					path = arg;
+					fileurl = lslinks_path_to_url(arg);
+				}
+				
+				if (!fileurl || !path) {
+					perror(arg);
+					if (output) fclose(print_opts.fp);
+					if (headers) curl_slist_free_all(headers);
+					if (used_curl) curl_global_cleanup();
+					return EXIT_FAILURE;
 				}
 
 				FILE *input = fopen(path,"rb");
-
 				if (!input) {
-					perror(url);
-					if (fileurl) free(fileurl);
+					perror(path);
+					if (path != arg) free(path);
+					if (fileurl != arg) free(fileurl);
 					if (output) fclose(print_opts.fp);
 					if (headers) curl_slist_free_all(headers);
 					if (used_curl) curl_global_cleanup();
 					return EXIT_FAILURE;
 				}
 
-				if (!lslinks_file(input, tags, !base ? (!fileurl ? url : fileurl) : base, &print_opts, &lslinks_print_link)) {
-					perror(url);
+				if (!lslinks_file(input, tags, !base ? fileurl : base, &print_opts, &lslinks_print_link)) {
+					perror(arg);
 					fclose(input);
-					if (fileurl) free(fileurl);
+					if (path != arg) free(path);
+					if (fileurl != arg) free(fileurl);
 					if (output) fclose(print_opts.fp);
 					if (headers) curl_slist_free_all(headers);
 					if (used_curl) curl_global_cleanup();
 					return EXIT_FAILURE;
 				}
 
+				if (path != arg) free(path);
+				if (fileurl != arg) free(fileurl);
 				fclose(input);
 			}
 			else {
 				if (!used_curl) {
 					if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0) {
-						perror("initializing curl");
+						fprintf(stderr, "%s: initializing curl\n", arg);
 						if (output) fclose(print_opts.fp);
 						if (headers) curl_slist_free_all(headers);
 						return EXIT_FAILURE;
@@ -260,7 +255,7 @@ int main(int argc, char* argv[]) {
 
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, receive_data);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &bytes);
-				curl_easy_setopt(curl, CURLOPT_URL, url);
+				curl_easy_setopt(curl, CURLOPT_URL, arg);
 				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 				curl_easy_setopt(curl, CURLOPT_USERAGENT, agent);
@@ -309,7 +304,7 @@ int main(int argc, char* argv[]) {
 				
 				CURLcode res = curl_easy_perform(curl);
 				if (res != CURLE_OK) {
-					fprintf(stderr, "%s: %s\n", url, curl_easy_strerror(res));
+					fprintf(stderr, "%s: %s\n", arg, curl_easy_strerror(res));
 					lslinks_bytes_cleanup(&bytes);
 				    curl_easy_cleanup(curl);
 					curl_global_cleanup();
@@ -318,8 +313,8 @@ int main(int argc, char* argv[]) {
 					return EXIT_FAILURE;
 				}
 
-				if (!lslinks_bytes_append(&bytes, "", 1)) {
-					perror(url);
+				if (!lslinks_bytes_append_nil(&bytes)) {
+					perror(arg);
 					lslinks_bytes_cleanup(&bytes);
 				    curl_easy_cleanup(curl);
 					curl_global_cleanup();
@@ -328,8 +323,8 @@ int main(int argc, char* argv[]) {
 					return EXIT_FAILURE;
 				}
 
-				if (!lslinks_str(bytes.data, tags, !base ? url : base, &print_opts, &lslinks_print_link)) {
-					perror(url);
+				if (!lslinks_str(bytes.data, tags, !base ? arg : base, &print_opts, &lslinks_print_link)) {
+					perror(arg);
 					lslinks_bytes_cleanup(&bytes);
 				    curl_easy_cleanup(curl);
 					curl_global_cleanup();

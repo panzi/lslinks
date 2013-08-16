@@ -1,0 +1,107 @@
+.mso www.tmac
+.TH LSLINKS 1 "16 August 2013"
+.SH NAME
+lslinks \- list links from a HTML document
+.SH SYNOPSIS
+\fBlslinks\fR [\fIOPTION\fR]... [\fIFILE\fR or \fIURL\fR]...
+.SH DESCRIPTION
+\fBlslinks\fR is a utility to list links from a HTML document. The document
+can be read from a local file, stdin or a web site.
+.SH OPTIONS
+.IP "\fB\-h\fR"
+.PD 0
+.IP "\fB\-\-help\fR"
+.PD
+Print help message.
+.IP "\fB\-v\fR"
+.PD 0
+.IP "\fB\-\-version\fR"
+.PD
+Print version.
+.SS "General Options"
+.IP "\fB\-O\fR \fIFILE\fR"
+.PD 0
+.IP "\fB\-\-output=\fIFILE\fR"
+.PD
+Write output to \fIFILE\fR.
+.IP "\fB\-t\fR \fITAGS\fR"
+.PD 0
+.IP "\fB\-\-tags=\fITAGS\fR"
+.PD
+Comma separated list of HTML tags to look at.
+.br
+Supported tags: \fIa\fR, \fIapplet\fR, \fIarea\fR, \fIaudio\fR,
+\fIbase\fR, \fIembed\fR, \fIform\fR, \fIframe\fR, \fIiframe\fR, 
+\fIimg\fR, \fIlink\fR, \fIobject\fR, \fIscript\fR, \fIsource\fR, 
+\fIstyle\fR, \fIvideo\fR. 
+.br
+Per default all supported tags get looked at.
+.IP "\fB\-n\fR"
+.PD 0
+.IP "\fB\-\-tag-name\fR"
+.PD
+Print the name of the tag from which the URL was extracted.
+.IP "\fB\-d\fR \fICHAR\fR"
+.PD 0
+.IP "\fB\-\-delim=\fICHAR\fR"
+.PD
+Use \fICHAR\fR to delimite output (default: \fI'\\n'\fR)
+.IP "\fB\-0\fR"
+.PD 0
+.IP "\fB\-\-zero\fR"
+.PD
+Use a zero-byte to delimite output.
+.IP "\fB\-b\fR \fIURL\fR"
+.PD 0
+.IP "\fB\-\-base=\fIURL\fR"
+.PD
+Use \fIURL\fR as document base (useful when reading from stdin).
+Note that if a document explicitely declares a base via a base
+tag this option will be ignored.
+.SS HTTP Options
+.IP "\fB\-a\fR \fIAGENT\fR"
+.PD 0
+.IP "\fB\-\-user-agent=\fIAGENT\fR"
+.PD
+Use \fIAGENT\fR as the user agent.
+.IP "\fB\-r\fR \fIURL\fR"
+.PD 0
+.IP "\fB\-\-referrer=\fIURL\fR"
+.PD
+Use \fIURL\fR as referrer.
+.IP "\fB\-R\fR"
+.PD 0
+.IP "\fB\-\-no-redirect\fR"
+.PD
+Don't follow redirects.
+.IP "\fB\-c\fR \fIFILE\fR"
+.PD 0
+.IP "\fB\-\-cookie-file=\fIFILE\fR"
+.PD
+Read cookies from \fIFILE\fR.
+.IP "\fB\-j\fR \fIFILE\fR"
+.PD 0
+.IP "\fB\-\-cookie-jar=\fIFILE\fR"
+.PD
+Write cookies to \fIFILE\fR.
+.IP "\fB\-H\fR \fIHEADER\fR"
+.PD 0
+.IP "\fB\-\-header=\fIHEADER\fR"
+.PD
+Send additional request header.
+.IP "\fB\-m\fR \fIMETHOD\fR"
+.PD 0
+.IP "\fB\-\-method=\fIMETHOD\fR"
+.PD
+Set the request \fIMETHOD\fR (default: \fIGET\fR)
+.br
+Supported values: \fIGET\fR, \fIPOST\fR, \fIPUT\fR, \fIDELETE\fR, \fIPATCH\fR
+.SH AUTHOR
+Written by Mathias Panzenb\[:o]ck <grosser.meister.morti@gmx.net>.
+.SH COPYRIGHT
+Copyright (c) 2013 Mathias Panzenb\[:o]ck
+.SH "SEE ALSO"
+joinurl(1)
+.SH BUGS
+Report bugs on
+.URL "https://github.com/panzi/lslinks/issues" "GitHub".

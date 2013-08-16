@@ -1,0 +1,20 @@
+.mso www.tmac
+.TH JOINURL 1 "16 August 2013"
+.SH NAME
+joinurl \- build an abosulute url from a base url and an relative url
+.SH SYNOPSIS
+\fBjoinurl\fR \fIBASE-URL\fR [\fIRELATIVE-URL\fR]...
+.SH DESCRIPTION
+\fBjoinurl\fR is a utility that builds an absolute url from a base url and
+a number of relative urls. If the first argument isn't an absolute url it is
+assumed to be an file path and converted into a file url. Only Unix style
+file urls are supported.
+.SH AUTHOR
+Written by Mathias Panzenb\[:o]ck <grosser.meister.morti@gmx.net>.
+.SH COPYRIGHT
+Copyright (c) 2013 Mathias Panzenb\[:o]ck
+.SH "SEE ALSO"
+lslinks(1)
+.SH BUGS
+Report bugs on
+.URL "https://github.com/panzi/lslinks/issues" "GitHub".
