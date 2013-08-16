@@ -10,14 +10,19 @@
 
 bool lslinks_is_absurl(const char *url) {
 	const char *ptr = url;
-	for (;; ++ ptr) {
+
+	if (!isalpha(*ptr)) {
+		return false;
+	}
+
+	for (++ ptr;; ++ ptr) {
 		char ch = *ptr;
-		if (!isalnum(ch) && ch != '-' && ch != '_' && ch != '+' && ch != '.') {
+		if (!isalnum(ch) && ch != '-' && ch != '+' && ch != '.') {
 			break;
 		}
 	}
 
-	return ptr != url && *ptr == ':';
+	return *ptr == ':';
 }
 
 bool lslinks_is_fileurl(const char *url) {
