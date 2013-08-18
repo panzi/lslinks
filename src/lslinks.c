@@ -13,6 +13,27 @@ struct lslinks_data {
 	lslinks_callback callback;
 };
 
+static const char *meta_properties[] = {
+	"og:url",
+	"og:audio",
+	"og:video",
+	"og:image",
+	"og:audio:url",
+	"og:video:url",
+	"og:image:url",
+	"og:audio:secure_url",
+	"og:video:secure_url",
+	"og:image:secure_url",
+	NULL
+};
+
+static const char *meta_names[] = {
+	"twitter:image:src",
+	"twitter:player",
+	"twitter:player:stream",
+	NULL
+};
+
 static bool lslinks_find(struct lslinks_data *data, GumboNode* node);
 
 #define GET_ATTR(NAME) \
@@ -139,6 +160,29 @@ bool lslinks_find(struct lslinks_data *data, GumboNode* node) {
 				GET_ATTR("action");
 			}
 			break;
+
+		case GUMBO_TAG_META:
+			if (data->tags & LSLINKS_META) {
+				// TODO:
+				// <meta http-equiv="refresh" content="30; URL=http://www.metatags.org/login"/>
+
+				if ((attr = gumbo_get_attribute(&node->v.element.attributes, "property"))) {
+					for (const char **property = meta_properties; *property; ++ property) {
+						if (strcmp(*property, attr->value) == 0) {
+							GET_ATTR("content");
+							break;
+						}
+					}
+				}
+				else if ((attr = gumbo_get_attribute(&node->v.element.attributes, "name"))) {
+					for (const char **name = meta_names; *name; ++ name) {
+						if (strcmp(*name, attr->value) == 0) {
+							GET_ATTR("content");
+							break;
+						}
+					}
+				}
+			}
 	}
 	
 	GumboVector* children = &node->v.element.children;
@@ -230,6 +274,9 @@ int lslinks_parse_tags(const char *s) {
 		}
 		else if (strncasecmp("form",ptr,n) == 0) {
 			tag = LSLINKS_FORM;
+		}
+		else if (strncasecmp("meta",ptr,n) == 0) {
+			tag = LSLINKS_META;
 		}
 		else if (strncasecmp("*",ptr,n) == 0) {
 			tag = LSLINKS_ALL;

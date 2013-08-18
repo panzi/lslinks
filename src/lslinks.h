@@ -22,10 +22,9 @@ enum lslinks_tag {
 	LSLINKS_AREA   = 1 << 13,
 	LSLINKS_BASE   = 1 << 14,
 	LSLINKS_FORM   = 1 << 15,
-
-	// TODO: <meta name="og:*"> etc.
+	LSLINKS_META   = 1 << 16,
 };
-#define LSLINKS_ALL ~(~0 << 15)
+#define LSLINKS_ALL ~(~0 << 17)
 
 struct lslinks_print_options {
 	bool tagname;
