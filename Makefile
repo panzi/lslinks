@@ -1,6 +1,5 @@
 CFLAGS=-std=gnu99 -Wall -Wno-switch -Werror -g -O2
 LSLINKS_LIBS=-lgumbo -lcurl
-JOINURL_LIBS=-lgumbo
 PREFIX=/usr
 CC=gcc
 
@@ -24,7 +23,10 @@ build/lslinks: build/main.o build/lslinks.o build/url.o build/bytes.o
 	$(CC) $(CFLAGS) $(LSLINKS_LIBS) -o $@ build/main.o build/lslinks.o build/url.o build/bytes.o
 
 build/joinurl: build/joinurl.o build/url.o build/bytes.o
-	$(CC) $(CFLAGS) $(JOINURL_LIBS) -o $@ build/joinurl.o build/url.o build/bytes.o
+	$(CC) $(CFLAGS) -o $@ build/joinurl.o build/url.o build/bytes.o
+
+build/csstok: build/csstok.o build/css_tokenizer.o build/bytes.o
+	$(CC) $(CFLAGS) -o $@ build/csstok.o build/css_tokenizer.o build/bytes.o
 
 build/lslinks.o: src/lslinks.c src/lslinks.h
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -39,6 +41,12 @@ build/bytes.o: src/bytes.c src/bytes.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 build/url.o: src/url.c src/bytes.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+build/csstok.o: src/csstok.c src/css_tokenizer.h
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+build/css_tokenizer.o: src/css_tokenizer.c src/css_tokenizer.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 build/lslinks.1.gz: man/lslinks.man
