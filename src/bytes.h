@@ -18,6 +18,7 @@ bool lslinks_bytes_init2(struct lslinks_bytes *bytes, size_t increment);
 void lslinks_bytes_cleanup(struct lslinks_bytes *bytes);
 bool lslinks_bytes_ensure(struct lslinks_bytes *bytes, size_t size);
 bool lslinks_bytes_append(struct lslinks_bytes *bytes, const void *data, size_t size);
+bool lslinks_bytes_append_char(struct lslinks_bytes *bytes, char ch);
 bool lslinks_bytes_append_str(struct lslinks_bytes *bytes, const char *str);
 bool lslinks_bytes_append_nil(struct lslinks_bytes *bytes);
 bool lslinks_bytes_readall(struct lslinks_bytes *bytes, FILE *fp);

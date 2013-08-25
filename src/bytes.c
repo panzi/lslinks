@@ -60,6 +60,10 @@ bool lslinks_bytes_append_str(struct lslinks_bytes *bytes, const char *str) {
 	return lslinks_bytes_append(bytes, str, strlen(str));
 }
 
+bool lslinks_bytes_append_char(struct lslinks_bytes *bytes, char ch) {
+	return lslinks_bytes_append(bytes, &ch, 1);
+}
+
 bool lslinks_bytes_append_nil(struct lslinks_bytes *bytes) {
 	return lslinks_bytes_append(bytes, "", 1);
 }

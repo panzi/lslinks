@@ -1,10 +1,10 @@
 #ifndef LSLINKS_CSS_TOKENIZER_H__
 #define LSLINKS_CSS_TOKENIZER_H__
 
-#include <stdint.h>
 #include <stdio.h>
 
 #include "bytes.h"
+#include "unicode.h"
 
 enum lslinks_css_token {
 	LSLINKS_CSS_ERROR = -2, // only possible error: ENOMEM
@@ -32,6 +32,10 @@ enum lslinks_css_token {
 	LSLINKS_CSS_COLON,
 	LSLINKS_CSS_SEMICOLON,
 	LSLINKS_CSS_COMMA,
+	LSLINKS_CSS_ASTERISK,
+	LSLINKS_CSS_GREATER_THAN,
+	LSLINKS_CSS_PLUS,
+	LSLINKS_CSS_TILDE,
 	LSLINKS_CSS_LEFT_SQUARE,
 	LSLINKS_CSS_RIGHT_SQUARE,
 	LSLINKS_CSS_LEFT_PAREN,
@@ -49,8 +53,8 @@ struct lslinks_css_tokenizer {
 			const char *unit;
 		};
 		struct {
-			uint32_t unirng_start;
-			uint32_t unirng_end;
+			lslinks_codepoint unirng_start;
+			lslinks_codepoint unirng_end;
 		};
 	};
 
