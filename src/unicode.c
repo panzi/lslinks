@@ -107,7 +107,7 @@ size_t lslinks_utf8_encode_codepoint(lslinks_codepoint codepoint, char *buf, siz
 
 #define encode_prev_byte \
 		if (size > i) { \
-			buf[i] = 0xc0 | codepoint; \
+			buf[i] = 0x80 | (codepoint & 0x3f); \
 		} \
 		codepoint >>= 6; \
 		-- i;
